@@ -1,240 +1,3294 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<meta name="theme-color" content="#faf8f4">
-<title>Routine Balance · AI Daily Routine Advisor</title>
-<style>
-:root{--bg:#faf8f4;--card:#fff;--ink:#2b2a27;--mute:#6f6a60;--line:#e8e3d9;--accent:#4f7a6a;--accent-soft:#e3eee9;
---focus:#5b6fb0;--recovery:#4f7a6a;--movement:#c0833a;--connection:#b5576f;--admin:#7a7268}
-:root[data-theme=dark]{--bg:#191a1c;--card:#232426;--ink:#ece9e2;--mute:#9a958a;--line:#34353a;--accent:#7fb3a0;--accent-soft:#25332e;
---focus:#8a9be0;--recovery:#7fb3a0;--movement:#e0a867;--connection:#e083a0;--admin:#a59d92}
-*{box-sizing:border-box}
-html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
-.wrap{max-width:1040px;margin:0 auto;padding:20px 16px 60px}
-header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}
-h1{font:600 1.6rem Georgia,"Times New Roman",serif;margin:0}
-.sub{color:var(--mute);margin:2px 0 0;font-size:.95rem}
-button,input,select,textarea{font:inherit;color:inherit}
-.btn{background:var(--card);border:1px solid var(--line);padding:8px 14px;border-radius:10px;cursor:pointer}
-.btn:hover{border-color:var(--accent)}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.grid{display:grid;grid-template-columns:1fr 1.4fr;gap:16px}
-@media(max-width:820px){.grid{grid-template-columns:1fr}}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px}
-h2{font:600 1.1rem Georgia,serif;margin:0 0 12px}
-label{display:block;font-size:.9rem;color:var(--mute);margin-top:12px}
-label b{color:var(--ink);float:right}
-input[type=range]{width:100%;accent-color:var(--accent)}
-input[type=text],input[type=time],input[type=number],select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.score{display:flex;align-items:center;gap:18px}
-.ring{--p:0;width:110px;height:110px;border-radius:50%;flex:none;display:grid;place-items:center;
-background:conic-gradient(var(--accent) calc(var(--p)*1%),var(--line) 0)}
-.ring span{width:84px;height:84px;border-radius:50%;background:var(--card);display:grid;place-items:center;font:600 1.8rem Georgia,serif}
-.signals{display:grid;gap:8px;flex:1}
-.sig{font-size:.85rem;color:var(--mute)}
-.bar{height:7px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:3px}
-.bar i{display:block;height:100%;background:var(--accent);transition:width .3s}
-.tl{list-style:none;margin:0;padding:0}
-.tl li{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
-.tl li:last-child{border:0}
-.t{width:92px;flex:none;font-size:.85rem;color:var(--mute);font-variant-numeric:tabular-nums}
-.dot{width:10px;height:10px;border-radius:50%;flex:none}
-.name{flex:1}
-.done .name{text-decoration:line-through;color:var(--mute)}
-.tag{font-size:.75rem;color:var(--mute)}
-.x{background:none;border:0;color:var(--mute);cursor:pointer;font-size:1.1rem}
-.coach{background:var(--accent-soft);border-color:transparent}
-.coach p{margin:0 0 8px}
-.empty{color:var(--mute);margin:0}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.note{font-size:.8rem;color:var(--mute);margin-top:18px}
-@media print{header .btn,.actions,form,.x,.nofprint{display:none!important}body{background:#fff;color:#000}.card{break-inside:avoid}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>routinebalance — AI daily routine advisor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      /* Dark Theme (Default) */
+      --bg-base: #0a0708;
+      --bg-surface: rgba(20, 13, 15, 0.82);
+      --bg-card: rgba(25, 16, 19, 0.85);
+      --bg-card-hover: rgba(34, 21, 25, 0.95);
+      --border-color: rgba(228, 76, 91, 0.22);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --text-main: #f5eef0;
+      --text-muted: #9c8a8e;
+      --text-dim: #6e5e62;
+      
+      --accent: #e44c5b;
+      --accent-rgb: 228, 76, 91;
+      --accent-glow: rgba(228, 76, 91, 0.28);
+      --accent-light: #f56d7b;
+      --accent-gradient: linear-gradient(135deg, #e44c5b 0%, #d13042 100%);
+      --accent-chip: rgba(228, 76, 91, 0.16);
+      
+      --success: #3dd68c;
+      --warning: #f5a623;
+      --info: #4da2ff;
+      
+      --card-radius: 16px;
+      --chip-radius: 9999px;
+      --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    [data-theme="light"] {
+      --bg-base: #f7f1f2;
+      --bg-surface: rgba(255, 255, 255, 0.88);
+      --bg-card: rgba(255, 255, 255, 0.94);
+      --bg-card-hover: #ffffff;
+      --border-color: rgba(216, 53, 70, 0.25);
+      --border-subtle: rgba(0, 0, 0, 0.08);
+      --text-main: #1f1416;
+      --text-muted: #6e585c;
+      --text-dim: #998387;
+      
+      --accent: #d83546;
+      --accent-rgb: 216, 53, 70;
+      --accent-glow: rgba(216, 53, 70, 0.18);
+      --accent-light: #ea4d5d;
+      --accent-gradient: linear-gradient(135deg, #ea4d5d 0%, #c4293a 100%);
+      --accent-chip: rgba(216, 53, 70, 0.12);
+    }
+
+    [data-tone="low-key"] {
+      --accent: #cc5864;
+      --accent-rgb: 204, 88, 100;
+      --accent-glow: rgba(204, 88, 100, 0.2);
+    }
+
+    [data-tone="bright"] {
+      --accent: #ff4757;
+      --accent-rgb: 255, 71, 87;
+      --accent-glow: rgba(255, 71, 87, 0.38);
+      --accent-gradient: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+      position: relative;
+    }
+
+    /* FULL-BLEED SINGULARITY CANVAS */
+    #singularity-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      display: block;
+    }
+
+    .app-wrapper {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* GLASS CARD COMMON */
+    .glass-panel {
+      background: var(--bg-surface);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+    }
+
+    /* SCREENS: LOGIN, STUDENT INFO, DASHBOARD */
+    .screen-view {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      width: 100%;
+    }
+
+    .screen-view.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* AUTH / STUDENT ONBOARDING CENTERED CONTAINERS */
+    .onboarding-screen {
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      min-height: 100vh;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 460px;
+      border-radius: 24px;
+      padding: 38px 34px;
+      animation: modalFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .auth-logo-badge {
+      width: 52px;
+      height: 52px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 22px;
+      box-shadow: 0 0 20px var(--accent-glow);
+      margin-bottom: 14px;
+    }
+
+    .auth-header h2 {
+      font-size: 1.55rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-main);
+    }
+
+    .auth-header h2 span {
+      color: var(--accent);
+    }
+
+    .auth-header p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .step-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+
+    .step-dot {
+      width: 26px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--border-subtle);
+      transition: var(--transition-smooth);
+    }
+
+    .step-dot.active {
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent-glow);
+      width: 42px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .input-field {
+      width: 100%;
+      background: rgba(15, 10, 12, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+      transition: var(--transition-smooth);
+      font-family: inherit;
+    }
+
+    [data-theme="light"] .input-field {
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .input-field:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--accent-gradient);
+      border: none;
+      color: #ffffff;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 18px var(--accent-glow);
+      transition: var(--transition-smooth);
+      margin-top: 20px;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--accent-glow);
+    }
+
+    .btn-ghost {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 11px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: var(--transition-smooth);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--border-color);
+      color: var(--text-main);
+    }
+
+    /* Student Quick Chips */
+    .quick-chips-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .choice-chip {
+      background: rgba(15, 10, 12, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 8px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      transition: var(--transition-smooth);
+    }
+
+    .choice-chip.active {
+      border-color: var(--accent);
+      background: var(--accent-chip);
+      color: var(--accent-light);
+      font-weight: 700;
+    }
+
+    /* DASHBOARD HEADER & LAYOUT */
+    #screen-dashboard {
+      flex-direction: column;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 28px;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 18px;
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    .brand-text h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text-main);
+    }
+
+    .brand-text h1 span {
+      color: var(--accent);
+    }
+
+    .brand-text p {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: -2px;
+    }
+
+    .header-center {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .student-badge-top {
+      background: var(--accent-chip);
+      border: 1px solid var(--border-color);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .student-badge-top i {
+      color: var(--accent);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: var(--transition-smooth);
+    }
+
+    .btn-icon:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .user-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--accent-chip);
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    /* Main Grid */
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: 290px 1fr 310px;
+      gap: 22px;
+      padding: 22px 28px;
+      max-width: 1720px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    @media (max-width: 1300px) {
+      .dashboard-layout {
+        grid-template-columns: 280px 1fr;
+      }
+      .right-panel {
+        grid-column: span 2;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+    }
+
+    @media (max-width: 960px) {
+      .dashboard-layout {
+        grid-template-columns: 1fr;
+      }
+      .right-panel {
+        grid-column: span 1;
+        grid-template-columns: 1fr;
+      }
+      header {
+        padding: 12px 18px;
+      }
+      .header-center {
+        display: none;
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--card-radius);
+      padding: 20px;
+      position: relative;
+      transition: var(--transition-smooth);
+    }
+
+    .card:hover {
+      border-color: rgba(228, 76, 91, 0.45);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+    }
+
+    .section-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .section-eyebrow .add-btn {
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      font-weight: 600;
+    }
+
+    /* Left Panel */
+    .left-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .tone-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .tone-pill-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+      background: rgba(10, 6, 8, 0.6);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      margin: 14px 0;
+    }
+
+    .tone-pill {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 4px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      text-align: center;
+    }
+
+    .tone-pill.active {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 2px 10px var(--accent-glow);
+    }
+
+    .tone-pill:hover:not(.active) {
+      color: var(--text-main);
+    }
+
+    .metric-slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 6px;
+    }
+
+    .metric-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .metric-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+    }
+
+    .metric-label {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .metric-val {
+      color: var(--text-main);
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      background: var(--border-color);
+      border-radius: 999px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--accent-glow);
+      transition: transform 0.15s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    /* Commitments */
+    .commitments-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .commitment-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: rgba(12, 8, 10, 0.5);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      transition: var(--transition-smooth);
+    }
+
+    .commitment-item:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-color);
+    }
+
+    .commitment-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .commitment-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--accent-chip);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+
+    .commitment-details h4 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .commitment-details h4.done {
+      text-decoration: line-through;
+      color: var(--text-dim);
+    }
+
+    .commitment-details p {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .check-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-color);
+      background: transparent;
+      color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.7rem;
+      transition: var(--transition-smooth);
+    }
+
+    .check-btn.checked {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* Center Panel */
+    .center-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .hero-banner {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .hero-content .motto {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+
+    .hero-content h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      color: var(--text-main);
+    }
+
+    .hero-content h2 span {
+      color: var(--accent);
+      text-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .hero-content .subtitle {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition-smooth);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent);
+    }
+
+    .btn-primary {
+      background: var(--accent-gradient);
+      border: none;
+      color: #ffffff;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 16px var(--accent-glow);
+      transition: var(--transition-smooth);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px var(--accent-glow);
+    }
+
+    /* Days Timeline */
+    .timeline-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 2px 10px 2px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-color) transparent;
+    }
+
+    .day-chip {
+      flex: 0 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 10px 14px;
+      min-width: 90px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      user-select: none;
+    }
+
+    .day-chip:hover {
+      border-color: var(--accent-light);
+      background: var(--bg-card-hover);
+      transform: translateY(-2px);
+    }
+
+    .day-chip.active {
+      background: var(--accent-chip);
+      border: 1.5px solid var(--accent);
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
+
+    .day-chip-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .day-chip.active .day-chip-title {
+      color: var(--accent);
+    }
+
+    .day-chip-desc {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+      white-space: nowrap;
+    }
+
+    /* Stats Grid */
+    .stats-row {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 820px) {
+      .stats-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .score-card {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      padding: 24px;
+    }
+
+    .circular-progress {
+      position: relative;
+      width: 110px;
+      height: 110px;
+      flex-shrink: 0;
+    }
+
+    .circular-progress svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .circular-progress circle {
+      fill: none;
+      stroke-width: 8;
+      stroke-linecap: round;
+    }
+
+    .circle-bg {
+      stroke: var(--border-color);
+    }
+
+    .circle-val {
+      stroke: var(--accent);
+      stroke-dasharray: 283;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 0.8s ease;
+    }
+
+    .score-inner-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .score-number {
+      font-size: 1.6rem;
+      font-weight: 800;
+      font-family: 'Space Grotesk', sans-serif;
+      color: var(--text-main);
+      line-height: 1;
+    }
+
+    .score-denom {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .score-details h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .score-details p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-bottom: 8px;
+    }
+
+    .score-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-chip);
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(228, 76, 91, 0.2);
+    }
+
+    .mini-stats-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .mini-stat-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px 18px;
+    }
+
+    .mini-stat-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mini-stat-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--accent-chip);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+
+    .mini-stat-left h5 {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .mini-stat-left p {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .mini-stat-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* Schedule Card */
+    .schedule-card {
+      padding: 22px;
+    }
+
+    .schedule-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .schedule-title h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .btn-text-link {
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .schedule-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    .schedule-table th {
+      text-align: left;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-dim);
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .schedule-table td {
+      padding: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      vertical-align: middle;
+    }
+
+    .schedule-table tr {
+      transition: background-color 0.15s ease;
+      cursor: pointer;
+    }
+
+    .schedule-table tr:hover td {
+      background: var(--bg-card-hover);
+      color: var(--text-main);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .status-badge.completed {
+      background: rgba(61, 214, 140, 0.12);
+      color: var(--success);
+      border: 1px solid rgba(61, 214, 140, 0.25);
+    }
+
+    .status-badge.in-progress {
+      background: rgba(245, 166, 35, 0.12);
+      color: var(--warning);
+      border: 1px solid rgba(245, 166, 35, 0.25);
+    }
+
+    .status-badge.scheduled {
+      background: rgba(156, 138, 142, 0.12);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+    }
+
+    /* Right Panel */
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .live-signals {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .live-bar-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .live-bar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+    }
+
+    .live-bar-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+    }
+
+    .live-bar-val {
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+      color: var(--text-main);
+    }
+
+    .bar-bg {
+      height: 6px;
+      background: var(--border-color);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 999px;
+      transition: width 0.6s ease;
+    }
+
+    /* Nudge Card */
+    .nudge-card {
+      background: linear-gradient(145deg, var(--bg-surface) 0%, var(--bg-card) 100%);
+      border: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nudge-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--accent);
+    }
+
+    .nudge-card h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .nudge-card p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+
+    .nudge-link {
+      font-size: 0.78rem;
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .weekly-chart {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      height: 90px;
+      padding-top: 14px;
+      gap: 6px;
+    }
+
+    .chart-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .chart-bar-outer {
+      width: 100%;
+      max-width: 24px;
+      background: var(--bg-card);
+      border-radius: 6px;
+      display: flex;
+      align-items: flex-end;
+      height: 65px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .chart-bar-inner {
+      width: 100%;
+      background: var(--accent-chip);
+      border-radius: 6px;
+      transition: height 0.5s ease;
+    }
+
+    .chart-bar-inner.highlight {
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .chart-day-label {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+
+    /* Modals & AI Coach Drawer */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-content {
+      background: var(--bg-surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      width: 90%;
+      max-width: 580px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      transform: scale(0.95);
+      transition: transform 0.25s ease;
+      overflow: hidden;
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-card);
+    }
+
+    .modal-header h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition-smooth);
+    }
+
+    .modal-close:hover {
+      background: var(--bg-surface);
+      color: var(--text-main);
+    }
+
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      font-size: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .coach-tabs {
+      display: flex;
+      gap: 8px;
+      background: var(--bg-card);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .coach-tab-btn {
+      flex: 1;
+      padding: 9px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 8px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: var(--transition-smooth);
+    }
+
+    .coach-tab-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .coach-chat-history {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .coach-msg {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .coach-msg-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .coach-msg-bubble {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      border-top-left-radius: 2px;
+      padding: 12px 14px;
+      font-size: 0.84rem;
+      color: var(--text-main);
+      line-height: 1.45;
+      max-width: 90%;
+    }
+
+    .coach-msg-bubble strong {
+      color: var(--accent);
+    }
+
+    .rec-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      transition: var(--transition-smooth);
+    }
+
+    .rec-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .rec-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--accent-chip);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .rec-info h5 {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 3px;
+    }
+
+    .rec-info p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .rec-action {
+      margin-top: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+    }
+
+    .coach-input-wrap {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .coach-input-wrap input {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-size: 0.84rem;
+      outline: none;
+    }
+
+    .coach-input-wrap input:focus {
+      border-color: var(--accent);
+    }
+
+    .coach-input-wrap button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 0 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--accent);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      padding: 12px 18px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-main);
+      font-size: 0.85rem;
+      font-weight: 600;
+      animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      pointer-events: auto;
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
 </head>
-<body>
-<div class="wrap">
-<header>
-  <div>
-    <h1>Routine Balance</h1>
-    <p class="sub">AI-based daily routine balance advisor</p>
-  </div>
-  <div>
-    <button class="btn" id="theme" type="button">Dark mode</button>
-    <button class="btn" id="print" type="button">Print / save</button>
-  </div>
-</header>
+<body data-theme="dark" data-tone="steady">
 
-<div class="grid">
-  <div>
-    <section class="card">
-      <h2>How are you today?</h2>
-      <label>Energy <b id="vEnergy"></b></label>
-      <input type="range" id="energy" min="1" max="10">
-      <label>Sleep last night (hours) <b id="vSleep"></b></label>
-      <input type="range" id="sleep" min="3" max="11" step="0.5">
-      <label>Mood <b id="vMood"></b></label>
-      <input type="range" id="mood" min="1" max="10">
-    </section>
+  <!-- THE SINGULARITY RUBBER-SHEET CANVAS BACKGROUND -->
+  <canvas id="singularity-canvas"></canvas>
 
-    <section class="card">
-      <h2>Add a commitment</h2>
-      <form id="form">
-        <label for="title" style="margin-top:0">What is it?</label>
-        <input type="text" id="title" required maxlength="60" placeholder="e.g. Study for exam">
-        <div class="row">
-          <div><label for="start">Start time</label><input type="time" id="start" value="09:00" required></div>
-          <div><label for="dur">Minutes</label><input type="number" id="dur" value="60" min="5" max="480" step="5" required></div>
+  <div class="app-wrapper">
+
+    <!-- ==========================================
+         SCREEN 1: LOGIN
+         ========================================== -->
+    <section class="screen-view onboarding-screen active" id="screen-login">
+      <div class="glass-panel auth-card">
+        <div class="auth-header">
+          <div class="auth-logo-badge">
+            <i class="fa-solid fa-sparkles"></i>
+          </div>
+          <h2>routine<span>balance</span></h2>
+          <p id="auth-subtitle">Sign in to your adaptive routine workspace</p>
         </div>
-        <label for="cat">Category</label>
-        <select id="cat">
-          <option value="focus">Focus</option>
-          <option value="recovery">Recovery</option>
-          <option value="movement">Movement</option>
-          <option value="connection">Connection</option>
-          <option value="admin">Life admin</option>
-        </select>
-        <div class="actions"><button class="btn primary" type="submit">Add to my day</button></div>
-      </form>
-    </section>
-  </div>
 
-  <div>
-    <section class="card">
-      <h2>Daily balance</h2>
-      <div class="score">
-        <div class="ring" id="ring"><span id="score">0</span></div>
-        <div class="signals" id="signals"></div>
+        <!-- Auth Tabs: Sign In / Create Account -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: rgba(10, 6, 8, 0.7); padding: 5px; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 20px;">
+          <button type="button" id="tab-login-btn" class="tone-pill active" style="font-size: 0.85rem; padding: 10px;">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In
+          </button>
+          <button type="button" id="tab-signup-btn" class="tone-pill" style="font-size: 0.85rem; padding: 10px;">
+            <i class="fa-solid fa-user-plus"></i> Create Account
+          </button>
+        </div>
+
+        <div class="step-indicator" id="auth-step-dots">
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+          <div class="step-dot"></div>
+        </div>
+
+        <!-- 1. LOGIN FORM -->
+        <form id="login-form">
+          <div class="form-group">
+            <label class="form-label">Email or Student ID</label>
+            <input type="text" class="input-field" id="login-email" placeholder="e.g. alex.chen@campus.edu" value="alex.student@university.edu" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="input-field" id="login-pass" placeholder="••••••••" value="routine2026" required />
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin: 12px 0 18px 0; font-size: 0.8rem; color: var(--text-muted);">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input type="checkbox" checked style="accent-color: var(--accent);" /> Remember me
+            </label>
+            <a href="#" id="auth-switch-to-signup" style="color: var(--accent); text-decoration: none; font-weight: 600;">Create new account?</a>
+          </div>
+
+          <button type="submit" class="btn-submit" id="btn-login-submit">
+            <span>Sign In & Continue</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+
+          <button type="button" class="btn-ghost" id="btn-quick-guest">
+            <i class="fa-solid fa-bolt"></i> Quick Demo Access
+          </button>
+        </form>
+
+        <!-- 2. CREATE ACCOUNT FORM (Initially Hidden) -->
+        <form id="signup-form" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Student Full Name</label>
+            <input type="text" class="input-field" id="signup-name" placeholder="e.g. Jordan Smith" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" class="input-field" id="signup-email" placeholder="e.g. jordan@campus.edu" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Create Password</label>
+            <input type="password" class="input-field" id="signup-pass" placeholder="At least 6 characters" required />
+          </div>
+
+          <button type="submit" class="btn-submit" id="btn-signup-submit">
+            <span>Create Account & Setup Profile</span>
+            <i class="fa-solid fa-check"></i>
+          </button>
+
+          <button type="button" class="btn-ghost" id="auth-switch-to-login">
+            <i class="fa-solid fa-arrow-left"></i> Already have an account? Sign In
+          </button>
+        </form>
       </div>
     </section>
 
-    <section class="card coach" aria-live="polite">
-      <h2>AI coach</h2>
-      <div id="coach"></div>
-    </section>
+    <!-- ==========================================
+         SCREEN 2: STUDENT INFORMATION ONBOARDING
+         ========================================== -->
+    <section class="screen-view onboarding-screen" id="screen-student-info">
+      <div class="glass-panel auth-card" style="max-width: 520px;">
+        <div class="auth-header">
+          <div class="auth-logo-badge" style="background: var(--accent-gradient);">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <h2>Student <span>Information</span></h2>
+          <p>Personalize your study rhythm, energy, and wellness plan</p>
+        </div>
 
-    <section class="card">
-      <h2>Today's plan</h2>
-      <ul class="tl" id="tl"></ul>
-      <div class="actions nofprint">
-        <button class="btn" id="rebalance" type="button">Rebalance gently</button>
-        <button class="btn" id="clear" type="button">Clear day</button>
+        <div class="step-indicator">
+          <div class="step-dot" style="background: var(--accent); opacity: 0.5;"></div>
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+        </div>
+
+        <form id="student-info-form">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Student Name</label>
+              <input type="text" class="input-field" id="student-name" placeholder="Full name" value="Alex Chen" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Major / Field</label>
+              <input type="text" class="input-field" id="student-major" placeholder="Major" value="Computer Science" required />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Semester / Year</label>
+              <input type="text" class="input-field" id="student-year" placeholder="e.g. Year 3, Sem 1" value="Year 3 (Fall)" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Study Schedule Tone</label>
+              <select class="input-field" id="student-routine-pref">
+                <option value="Steady" selected>Steady (Balanced)</option>
+                <option value="Low-key">Low-key (Gentle/Exam Recovery)</option>
+                <option value="Bright">Bright (High-Intensity Sprint)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Primary Daily Health Goal</label>
+            <div class="quick-chips-grid">
+              <div class="choice-chip active" data-goal="Circadian Focus"><i class="fa-solid fa-brain"></i> Focus Balance</div>
+              <div class="choice-chip" data-goal="Fitness & Movement"><i class="fa-solid fa-person-running"></i> Daily Fitness</div>
+              <div class="choice-chip" data-goal="Sleep Recovery"><i class="fa-solid fa-moon"></i> Sleep Repair</div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-submit" id="btn-save-student-info">
+            <span>Launch Routine Dashboard</span>
+            <i class="fa-solid fa-sparkles"></i>
+          </button>
+
+          <button type="button" class="btn-ghost" id="btn-back-to-login">
+            <i class="fa-solid fa-arrow-left"></i> Back to Login
+          </button>
+        </form>
       </div>
     </section>
+
+    <!-- ==========================================
+         SCREEN 3: MAIN DASHBOARD
+         ========================================== -->
+    <section class="screen-view" id="screen-dashboard">
+      
+      <!-- Top Sticky Navigation Bar -->
+      <header>
+        <a href="#" class="brand" id="dashboard-brand-link">
+          <div class="brand-icon">
+            <i class="fa-solid fa-sparkles"></i>
+          </div>
+          <div class="brand-text">
+            <h1>routine<span>balance</span></h1>
+            <p>AI daily routine advisor</p>
+          </div>
+        </a>
+
+        <div class="header-center">
+          <div class="student-badge-top" id="header-student-tag">
+            <i class="fa-solid fa-user-graduate"></i>
+            <span id="badge-student-name">Alex Chen</span> • <span id="badge-student-major" style="color: var(--accent);">CS (Year 3)</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 6px; height: 6px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 6px var(--accent);"></div>
+            <span id="header-date">Tuesday, October 13</span>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <!-- Dark / Light Mode Toggle Button -->
+          <button class="btn-icon" id="theme-toggle-btn" title="Toggle Light/Dark Mode" aria-label="Toggle Theme">
+            <i class="fa-solid fa-moon" id="theme-icon"></i>
+          </button>
+
+          <!-- Quick AI Advisor Modal Trigger -->
+          <button class="btn-icon" id="quick-coach-btn" title="Open AI Advisor">
+            <i class="fa-solid fa-bars-staggered"></i>
+          </button>
+
+          <!-- Switch User / Logout button -->
+          <button class="btn-icon" id="switch-account-btn" title="Switch User / Edit Student Info">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+
+          <!-- Profile Avatar -->
+          <div class="user-avatar" id="user-profile-badge" title="Student Profile">
+            AC
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Layout Grid -->
+      <div class="dashboard-layout">
+        
+        <!-- Left Panel: Inputs & Commitments -->
+        <section class="left-panel">
+          
+          <!-- How are you feeling card -->
+          <div class="card">
+            <div class="section-eyebrow">
+              <span>Your Inputs</span>
+              <i class="fa-regular fa-sliders"></i>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+              <span style="font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">How are you feeling?</span>
+              <i class="fa-regular fa-sun" style="font-size: 0.85rem; color: var(--accent);"></i>
+            </div>
+            <div class="tone-title">Set the tone</div>
+
+            <!-- Tone Selector Pills: Low-key / Steady / Bright -->
+            <div class="tone-pill-group" role="radiogroup" aria-label="Select Daily Tone">
+              <button class="tone-pill" data-tone="low-key" id="btn-tone-lowkey">Low-key</button>
+              <button class="tone-pill active" data-tone="steady" id="btn-tone-steady">Steady</button>
+              <button class="tone-pill" data-tone="bright" id="btn-tone-bright">Bright</button>
+            </div>
+
+            <!-- Dynamic Energy & Sleep Sliders -->
+            <div class="metric-slider-group">
+              <div class="metric-row">
+                <div class="metric-info">
+                  <span class="metric-label">Energy</span>
+                  <span class="metric-val" id="energy-val-display">70%</span>
+                </div>
+                <div style="position: relative; display: flex; align-items: center;">
+                  <input type="range" id="energy-slider" min="10" max="100" value="70" step="5" />
+                </div>
+              </div>
+
+              <div class="metric-row">
+                <div class="metric-info">
+                  <span class="metric-label">Sleep last night</span>
+                  <span class="metric-val" id="sleep-val-display">7.5 h</span>
+                </div>
+                <div style="position: relative; display: flex; align-items: center;">
+                  <input type="range" id="sleep-slider" min="3.0" max="12.0" value="7.5" step="0.5" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Commitments Card -->
+          <div class="card">
+            <div class="section-eyebrow">
+              <span>Today's Commitments</span>
+              <button class="add-btn" id="add-commitment-btn"><i class="fa-solid fa-plus"></i> Add</button>
+            </div>
+
+            <div class="commitments-list" id="commitments-container">
+              <!-- Commitments rendered dynamically -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Center Panel: Days timeline, balance score, and schedule -->
+        <section class="center-panel">
+          
+          <!-- Hero Banner -->
+          <div class="hero-banner">
+            <div class="hero-content">
+              <div class="motto">A little structure, a lot more room</div>
+              <h2>Make today feel <span>doable.</span></h2>
+              <p class="subtitle" id="hero-subtitle">Your plan adapts to your energy rather than asking you to adapt to it.</p>
+            </div>
+            <div class="hero-actions">
+              <button class="btn-secondary" id="save-day-btn">
+                <i class="fa-solid fa-download"></i> Save day
+              </button>
+              <button class="btn-primary" id="open-coach-btn">
+                <i class="fa-solid fa-sparkles"></i> <span id="coach-btn-text">Coach updated</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Days 1 to 10 Interactive Navigator -->
+          <div class="timeline-container" id="days-timeline">
+            <!-- Generated dynamically -->
+          </div>
+
+          <!-- Balance Score & Stats Grid -->
+          <div class="stats-row">
+            <!-- Balance Score Card -->
+            <div class="card score-card">
+              <div class="circular-progress">
+                <svg viewBox="0 0 100 100">
+                  <circle class="circle-bg" cx="50" cy="50" r="45"></circle>
+                  <circle class="circle-val" id="progress-circle-bar" cx="50" cy="50" r="45"></circle>
+                </svg>
+                <div class="score-inner-text">
+                  <div class="score-number" id="balance-score-num">100</div>
+                  <div class="score-denom">/100</div>
+                </div>
+              </div>
+
+              <div class="score-details">
+                <div style="font-size: 0.68rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700; margin-bottom: 2px;" id="current-day-label">Day 1 • Oct 13</div>
+                <h3 id="score-heading">Work is done</h3>
+                <p id="score-description">You followed through on today's plan. Take the win and carry only what helps into tomorrow.</p>
+                <div class="score-tag" id="score-tag-badge">
+                  <i class="fa-solid fa-asterisk"></i> <span id="score-tag-text">Completion is worth noticing.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mini Stats Stack -->
+            <div class="mini-stats-grid">
+              <div class="mini-stat-card">
+                <div class="mini-stat-left">
+                  <div class="mini-stat-icon"><i class="fa-solid fa-clock"></i></div>
+                  <div>
+                    <h5>Focus windows</h5>
+                    <p>Deep work planned</p>
+                  </div>
+                </div>
+                <div class="mini-stat-val" id="focus-time-stat">90 min</div>
+              </div>
+
+              <div class="mini-stat-card">
+                <div class="mini-stat-left">
+                  <div class="mini-stat-icon"><i class="fa-solid fa-mug-saucer"></i></div>
+                  <div>
+                    <h5>Recovery time</h5>
+                    <p>Rest and restoration</p>
+                  </div>
+                </div>
+                <div class="mini-stat-val" id="recovery-time-stat">160 min</div>
+              </div>
+
+              <div class="mini-stat-card">
+                <div class="mini-stat-left">
+                  <div class="mini-stat-icon"><i class="fa-solid fa-list-check"></i></div>
+                  <div>
+                    <h5>Open loops</h5>
+                    <p>Intentions still to do</p>
+                  </div>
+                </div>
+                <div class="mini-stat-val" id="open-loops-stat">0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gentle Structure Section -->
+          <div class="card schedule-card">
+            <div class="schedule-header">
+              <div>
+                <div class="section-eyebrow" style="margin-bottom: 2px;">Your Day At A Glance</div>
+                <div class="schedule-title">
+                  <h3>Gentle structure</h3>
+                </div>
+              </div>
+              <button class="btn-text-link" id="rebalance-btn">
+                <i class="fa-solid fa-arrow-trend-up"></i> Rebalance day
+              </button>
+            </div>
+
+            <div style="overflow-x: auto;">
+              <table class="schedule-table">
+                <thead>
+                  <tr>
+                    <th style="width: 18%;">Time</th>
+                    <th style="width: 38%;">Plan</th>
+                    <th style="width: 26%;">Energy / Intention</th>
+                    <th style="width: 18%;">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="schedule-tbody">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Right Panel: Live Read, Signals & Nudge -->
+        <section class="right-panel">
+          <!-- Live Read Signals -->
+          <div class="card">
+            <div class="section-eyebrow">
+              <span>Live Read</span>
+              <span style="color: var(--accent); font-weight: 700; font-size: 0.72rem; display: flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-circle" style="font-size: 6px;"></i> Live
+              </span>
+            </div>
+            <div class="tone-title" style="margin-bottom: 16px;">Balance signals</div>
+
+            <div class="live-signals">
+              <div class="live-bar-item">
+                <div class="live-bar-header">
+                  <span class="live-bar-label"><i class="fa-solid fa-battery-half"></i> Energy</span>
+                  <span class="live-bar-val" id="signal-energy-val">70%</span>
+                </div>
+                <div class="bar-bg">
+                  <div class="bar-fill" id="signal-energy-bar" style="width: 70%;"></div>
+                </div>
+              </div>
+
+              <div class="live-bar-item">
+                <div class="live-bar-header">
+                  <span class="live-bar-label"><i class="fa-solid fa-moon"></i> Sleep</span>
+                  <span class="live-bar-val" id="signal-sleep-val">91%</span>
+                </div>
+                <div class="bar-bg">
+                  <div class="bar-fill" id="signal-sleep-bar" style="width: 91%;"></div>
+                </div>
+              </div>
+
+              <div class="live-bar-item">
+                <div class="live-bar-header">
+                  <span class="live-bar-label"><i class="fa-solid fa-heart-pulse"></i> Recovery</span>
+                  <span class="live-bar-val" id="signal-recovery-val">100%</span>
+                </div>
+                <div class="bar-bg">
+                  <div class="bar-fill" id="signal-recovery-bar" style="width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gentle Nudge -->
+          <div class="card nudge-card">
+            <div class="section-eyebrow">A Gentle Nudge</div>
+            <h4 id="nudge-title">Notice what is already working.</h4>
+            <p id="nudge-body">A balanced day is built from small choices: one focus block, one recovery moment, and a little connection.</p>
+            <a class="nudge-link" id="add-buffer-btn">Add a buffer →</a>
+          </div>
+
+          <!-- Weekly Chart -->
+          <div class="card">
+            <div class="section-eyebrow">This Week</div>
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Small steps count</h4>
+            
+            <div class="weekly-chart" id="weekly-chart-bars">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </section>
+
   </div>
-</div>
-<p class="note">Routine Balance gives supportive planning and reflection. It is not medical advice, a diagnosis, or a replacement for professional care. Your data stays in this browser.</p>
-</div>
 
-<script>
-const KEY='routine-balance-advisor-v1';
-const CATS={focus:'Focus',recovery:'Recovery',movement:'Movement',connection:'Connection',admin:'Life admin'};
-const DEFAULT={energy:6,sleep:7,mood:6,theme:'light',items:[
- {id:1,title:'Deep work block',start:'09:00',dur:90,cat:'focus',done:false},
- {id:2,title:'Walk outside',start:'13:00',dur:20,cat:'movement',done:false},
- {id:3,title:'Emails and errands',start:'15:00',dur:45,cat:'admin',done:false}]};
-let S=load();
-function load(){try{const r=localStorage.getItem(KEY);if(r)return Object.assign({},DEFAULT,JSON.parse(r))}catch(e){}return JSON.parse(JSON.stringify(DEFAULT))}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
-const $=id=>document.getElementById(id);
-const mins=t=>{const[a,b]=t.split(':').map(Number);return a*60+b};
-const fmt=m=>{m=((m%1440)+1440)%1440;const h=Math.floor(m/60),mm=m%60,ap=h>=12?'PM':'AM';return `${h%12||12}:${String(mm).padStart(2,'0')} ${ap}`};
-const esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  <!-- AI ROUTINE & HEALTH COACH MODAL -->
+  <div class="modal-overlay" id="coach-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-sparkles" style="color: var(--accent);"></i> Routine Balance AI Coach</h3>
+        <button class="modal-close" id="coach-modal-close" aria-label="Close Coach"><i class="fa-solid fa-xmark"></i></button>
+      </div>
 
-function stats(){
-  const tot={focus:0,recovery:0,movement:0,connection:0,admin:0};
-  S.items.forEach(i=>tot[i.cat]+=i.dur);
-  const sorted=[...S.items].sort((a,b)=>mins(a.start)-mins(b.start));
-  let overlap=0;
-  for(let i=1;i<sorted.length;i++){const e=mins(sorted[i-1].start)+sorted[i-1].dur;if(mins(sorted[i].start)<e)overlap++}
-  const busy=Object.values(tot).reduce((a,b)=>a+b,0);
-  const sleepScore=Math.max(0,Math.min(100,100-Math.abs(S.sleep-8)*18));
-  const energyScore=(S.energy*0.6+S.mood*0.4)*10;
-  const capacity=Math.max(180,(S.energy*60)+(S.sleep*20));
-  const loadScore=Math.max(0,Math.min(100,100-Math.max(0,busy-capacity)/capacity*100));
-  const care=tot.recovery+tot.movement+tot.connection;
-  const recScore=Math.min(100,Math.round(care/60*50+(tot.recovery>=20?25:0)+(tot.movement>=15?25:0)));
-  const penalty=overlap*8+(tot.focus>240?10:0);
-  const score=Math.max(0,Math.min(100,Math.round(sleepScore*.25+energyScore*.2+loadScore*.3+recScore*.25-penalty)));
-  return{tot,busy,overlap,sleepScore,energyScore,loadScore,recScore,score,capacity,sorted};
-}
+      <div class="modal-body">
+        <div class="coach-tabs">
+          <button class="coach-tab-btn active" data-tab="balance" id="tab-balance"><i class="fa-solid fa-scale-balanced"></i> Rebalance</button>
+          <button class="coach-tab-btn" data-tab="exercise" id="tab-exercise"><i class="fa-solid fa-person-running"></i> Exercise</button>
+          <button class="coach-tab-btn" data-tab="nutrition" id="tab-nutrition"><i class="fa-solid fa-apple-whole"></i> Nutrition</button>
+          <button class="coach-tab-btn" data-tab="chat" id="tab-chat"><i class="fa-solid fa-comments"></i> Ask AI</button>
+        </div>
 
-function render(){
-  $('energy').value=S.energy;$('sleep').value=S.sleep;$('mood').value=S.mood;
-  $('vEnergy').textContent=S.energy+'/10';$('vSleep').textContent=S.sleep+' h';$('vMood').textContent=S.mood+'/10';
-  document.documentElement.dataset.theme=S.theme;
-  $('theme').textContent=S.theme==='dark'?'Light mode':'Dark mode';
-  const st=stats();
-  $('score').textContent=st.score;$('ring').style.setProperty('--p',st.score);
-  const sg=[['Energy',st.energyScore],['Sleep',st.sleepScore],['Recovery',st.recScore],['Workload fit',st.loadScore]];
-  $('signals').innerHTML=sg.map(([n,v])=>`<div class="sig">${n}<div class="bar"><i style="width:${Math.round(v)}%"></i></div></div>`).join('');
-  $('tl').innerHTML=st.sorted.length?st.sorted.map(i=>`<li class="${i.done?'done':''}">
-    <input type="checkbox" data-done="${i.id}" ${i.done?'checked':''} aria-label="Mark ${esc(i.title)} done">
-    <span class="t">${fmt(mins(i.start))}</span><span class="dot" style="background:var(--${i.cat})"></span>
-    <span class="name">${esc(i.title)} <span class="tag">${CATS[i.cat]} · ${i.dur} min</span></span>
-    <button class="x" data-del="${i.id}" aria-label="Remove ${esc(i.title)}" type="button">×</button></li>`).join('')
-    :'<li class="empty">Nothing planned yet. Add a commitment to start building your day.</li>';
-  coach(st);
-}
+        <!-- Tab 1: Balance Advice -->
+        <div class="coach-tab-content" id="content-balance">
+          <div class="rec-card">
+            <div class="rec-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+            <div class="rec-info">
+              <h5>Dynamic Energy Alignment</h5>
+              <p id="coach-energy-diagnosis">Your current energy is 70% with 7.5h sleep. We recommend keeping your deep work window to 90 min and inserting an afternoon walking buffer.</p>
+              <div class="rec-action" id="apply-ai-routine-btn"><i class="fa-solid fa-check"></i> Apply optimized routine for today</div>
+            </div>
+          </div>
+          <div class="rec-card">
+            <div class="rec-icon"><i class="fa-solid fa-shield-heart"></i></div>
+            <div class="rec-info">
+              <h5>Burnout Prevention Alert</h5>
+              <p>Keep your focus-to-recovery ratio above 1:1.5. Avoid back-to-back high intensity study sessions after 2:00 PM.</p>
+            </div>
+          </div>
+        </div>
 
-function coach(st){
-  const m=[];
-  if(!S.items.length){m.push('Your day is open. Start with one thing that matters, then add something restful next to it.');}
-  else{
-    if(S.sleep<6)m.push(`You slept ${S.sleep} hours, so go easy today. Keep only the essentials and protect an early evening.`);
-    else if(S.sleep>=7&&S.energy>=7)m.push('You are well rested with good energy. This is a good day for your hardest focus work, early on.');
-    else m.push('You have a steady base today. Plan around it rather than pushing past it.');
-    if(S.mood<=4)m.push('Your mood is low. Add something small that feels kind, like a short walk or time with someone you like.');
-    if(st.overlap)m.push(`${st.overlap} commitment${st.overlap>1?'s overlap':' overlaps'}. Use "Rebalance gently" to spread them out.`);
-    if(st.busy>st.capacity)m.push(`You have about ${Math.round(st.busy/60*10)/10} hours planned, which is heavy for today's energy. Move one item to another day.`);
-    if(st.tot.focus>240)m.push('That is a lot of focus time. Breaks between blocks will help you keep your quality.');
-    if(st.tot.recovery<20)m.push('There is no real recovery time yet. Even 20 minutes of rest counts.');
-    if(st.tot.movement<15)m.push('Add a short movement break, even 15 minutes.');
-    if(st.tot.connection===0&&S.mood<8)m.push('A quick call or coffee with someone can lift the day.');
-    if(m.length<=2&&st.score>=75)m.push('This looks balanced and doable. Nice planning.');
-  }
-  $('coach').innerHTML=m.slice(0,4).map(t=>`<p>${esc(t)}</p>`).join('');
-}
+        <!-- Tab 2: Exercise & Movement Advice -->
+        <div class="coach-tab-content" id="content-exercise" style="display: none;">
+          <div class="coach-recommendations-list" style="display: grid; gap: 10px;">
+            <div class="rec-card">
+              <div class="rec-icon"><i class="fa-solid fa-person-walking"></i></div>
+              <div class="rec-info">
+                <h5>15-Minute Campus Sunlight Walk</h5>
+                <p>Best taken at 1:30 PM. Resets circadian dopamine and eye focal strain after long screen sessions.</p>
+                <div class="rec-action add-to-routine-btn" data-title="Sunlight Reset Walk" data-time="1:30 PM" data-dur="15 min">+ Add to today's schedule</div>
+              </div>
+            </div>
 
-function rebalance(){
-  const items=[...S.items].sort((a,b)=>mins(a.start)-mins(b.start));
-  let cursor=null;
-  items.forEach(i=>{
-    let s=mins(i.start);
-    if(cursor!==null&&s<cursor){s=cursor;i.start=`${String(Math.floor(s/60)%24).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
-    cursor=s+i.dur+10;
-  });
-  let rec=0;S.items.forEach(i=>{if(i.cat==='recovery')rec+=i.dur});
-  if(rec<20)S.items.push({id:Date.now(),title:'Rest break',start:'16:30',dur:20,cat:'recovery',done:false});
-  save();render();
-}
+            <div class="rec-card">
+              <div class="rec-icon"><i class="fa-solid fa-child-reaching"></i></div>
+              <div class="rec-info">
+                <h5>Desk Mobility & Spine Decompression</h5>
+                <p>Thoracic openers, neck stretches, and hamstrings release. Eases forward-head posture from laptops.</p>
+                <div class="rec-action add-to-routine-btn" data-title="Desk Mobility Decompression" data-time="3:45 PM" data-dur="10 min">+ Add to today's schedule</div>
+              </div>
+            </div>
 
-$('energy').oninput=e=>{S.energy=+e.target.value;save();render()};
-$('sleep').oninput=e=>{S.sleep=+e.target.value;save();render()};
-$('mood').oninput=e=>{S.mood=+e.target.value;save();render()};
-$('theme').onclick=()=>{S.theme=S.theme==='dark'?'light':'dark';save();render()};
-$('print').onclick=()=>window.print();
-$('rebalance').onclick=rebalance;
-$('clear').onclick=()=>{if(confirm('Clear all commitments for today?')){S.items=[];save();render()}};
-$('form').onsubmit=e=>{
-  e.preventDefault();
-  S.items.push({id:Date.now(),title:$('title').value.trim(),start:$('start').value,dur:+$('dur').value,cat:$('cat').value,done:false});
-  $('title').value='';save();render();
-};
-$('tl').onclick=e=>{
-  const d=e.target.dataset;
-  if(d.del){S.items=S.items.filter(i=>i.id!=d.del);save();render()}
-};
-$('tl').onchange=e=>{
-  const id=e.target.dataset.done;
-  if(id){const it=S.items.find(i=>i.id==id);if(it){it.done=e.target.checked;save();render()}}
-};
-render();
-</script>
-</body>
+            <div class="rec-card">
+              <div class="rec-icon"><i class="fa-solid fa-dumbbell"></i></div>
+              <div class="rec-info">
+                <h5>25-Min Strength Circuit</h5>
+                <p>Bodyweight squats, push-ups, and core hold. Ideal when energy exceeds 75% before evening dinner.</p>
+                <div class="rec-action add-to-routine-btn" data-title="25-min Strength Circuit" data-time="5:30 PM" data-dur="25 min">+ Add to today's schedule</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Nutrition & Healthy Food Items -->
+        <div class="coach-tab-content" id="content-nutrition" style="display: none;">
+          <div class="coach-recommendations-list" style="display: grid; gap: 10px;">
+            <div class="rec-card">
+              <div class="rec-icon"><i class="fa-solid fa-seedling"></i></div>
+              <div class="rec-info">
+                <h5>Brain Fuel: Walnuts & Dark Blueberries</h5>
+                <p>Polyphenols and omega-3 fatty acids sustain focus during study marathons without glycemic crashes.</p>
+                <div class="rec-action add-to-routine-btn" data-title="Brain Snack: Walnuts & Berries" data-time="3:15 PM" data-dur="10 min">+ Add to today's commitments</div>
+              </div>
+            </div>
+
+            <div class="rec-card">
+              <div class="rec-icon"><i class="fa-solid fa-mug-hot"></i></div>
+              <div class="rec-info">
+                <h5>Matcha / Green Tea with L-Theanine</h5>
+                <p>Provides calm alpha-wave concentration without the nervous spikes associated with energy drinks.</p>
+              </div>
+            </div>
+
+            <div class="rec-card">
+              <div class="rec-icon"><i class="fa-solid fa-bowl-food"></i></div>
+              <div class="rec-info">
+                <h5>Clean Protein & Avocado Power Bowl</h5>
+                <p>Nutrient dense balance of fats, complex carbs and amino acids that sustains 4+ hours of mental endurance.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: Interactive AI Chat Advisor -->
+        <div class="coach-tab-content" id="content-chat" style="display: none;">
+          <div class="coach-chat-history" id="coach-chat-box">
+            <div class="coach-msg">
+              <div class="coach-msg-avatar"><i class="fa-solid fa-robot"></i></div>
+              <div class="coach-msg-bubble">
+                Hello Alex! I am your <strong>RoutineBalance AI Coach</strong>. I analyze your academic schedule, sleep patterns, and energy. Ask me about custom study breaks, quick dorm workouts, or brain-fuel foods!
+              </div>
+            </div>
+          </div>
+
+          <div class="coach-input-wrap">
+            <input type="text" id="coach-user-input" placeholder="e.g. Suggest a healthy 10-min study break or pre-exam snack..." />
+            <button id="coach-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIVITY STATUS REPORT MODAL -->
+  <div class="modal-overlay" id="status-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="status-modal-title"><i class="fa-solid fa-file-waveform" style="color: var(--accent);"></i> Activity Status Report</h3>
+        <button class="modal-close" id="status-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" id="status-modal-body">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ==========================================================
+       SCRIPTS: SINGULARITY CANVAS ENGINE + APPLICATION FLOW
+       ========================================================== -->
+  <script>
+    /* ==========================================================
+       PART 1: THE SINGULARITY CANVAS (RUBBER SHEET UNDER A WEIGHT)
+       - Canvas 2D, no shader, no library
+       - Grid: points every 26px stored in 2D array
+       - The Well:
+           * lerp tracked pointer toward real pointer with 0.10
+           * d = distance to eased pointer
+           * g = exp(-(d*d) / (2 * SIG*SIG)), SIG = 0.42 * min(width, height)
+           * move point toward pointer along direction vector by g * PULL, PULL = 0.30 * min(width, height)
+           * dot radius = 0.9 + g * 1.9
+           * dot alpha = 0.16 + g * 0.62
+           * line alpha = 0.04 + (avg g of its 2 ends) * 0.62
+           * skip line if avg g < 0.004
+           * ResizeObserver with DPR transform capped at 2
+           * Lissajous drift before pointer enters:
+             x = 0.5 + 0.34*sin(t*0.7)*cos(t*0.23)
+             y = 0.5 + 0.30*sin(t*0.52+1.1)
+           * On touch: keep drift permanently
+       ========================================================== */
+    (function initSingularityCanvas() {
+      const canvas = document.getElementById('singularity-canvas');
+      const ctx = canvas.getContext('2d', { alpha: true });
+
+      const SPACING = 26;
+      let width = window.innerWidth;
+      let height = window.innerHeight;
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      let cols = 0;
+      let rows = 0;
+      let grid = []; // 2D array of base points { bx, by }
+
+      // Pointers
+      let realX = width * 0.5;
+      let realY = height * 0.5;
+      let easedX = width * 0.5;
+      let easedY = height * 0.5;
+
+      let hasEntered = false;
+      let isTouchDevice = false;
+      let startTime = performance.now();
+
+      function getThemeRGB() {
+        const style = getComputedStyle(document.body);
+        const rgbStr = style.getPropertyValue('--accent-rgb').trim() || '228, 76, 91';
+        return rgbStr;
+      }
+
+      function setupGrid() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+
+        cols = Math.ceil(width / SPACING) + 1;
+        rows = Math.ceil(height / SPACING) + 1;
+
+        const offsetX = (width - (cols - 1) * SPACING) * 0.5;
+        const offsetY = (height - (rows - 1) * SPACING) * 0.5;
+
+        grid = [];
+        for (let r = 0; r < rows; r++) {
+          const rowArr = [];
+          for (let c = 0; c < cols; c++) {
+            rowArr.push({
+              bx: offsetX + c * SPACING,
+              by: offsetY + r * SPACING
+            });
+          }
+          grid.push(rowArr);
+        }
+      }
+
+      // Pointer listeners
+      window.addEventListener('pointerenter', (e) => {
+        if (!isTouchDevice) {
+          hasEntered = true;
+          realX = e.clientX;
+          realY = e.clientY;
+        }
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!isTouchDevice) {
+          hasEntered = true;
+          realX = e.clientX;
+          realY = e.clientY;
+        }
+      });
+
+      window.addEventListener('pointerleave', () => {
+        // Return to center gently when pointer leaves viewport
+        realX = width * 0.5;
+        realY = height * 0.5;
+      });
+
+      // Touch detection
+      window.addEventListener('touchstart', () => {
+        isTouchDevice = true;
+      }, { passive: true });
+
+      // Resize observer
+      const resizeObserver = new ResizeObserver(() => {
+        setupGrid();
+      });
+      resizeObserver.observe(document.documentElement);
+      setupGrid();
+
+      // Render Loop
+      function render(now) {
+        requestAnimationFrame(render);
+
+        const t = (now - startTime) * 0.001;
+
+        // If pointer has never entered OR on touch device: follow Lissajous curve
+        if (!hasEntered || isTouchDevice) {
+          const lissX = (0.5 + 0.34 * Math.sin(t * 0.7) * Math.cos(t * 0.23)) * width;
+          const lissY = (0.5 + 0.30 * Math.sin(t * 0.52 + 1.1)) * height;
+          realX = lissX;
+          realY = lissY;
+        }
+
+        // Lerp tracked pointer toward real pointer with 0.10
+        easedX += (realX - easedX) * 0.10;
+        easedY += (realY - easedY) * 0.10;
+
+        const minDim = Math.min(width, height);
+        const SIG = 0.42 * minDim;
+        const PULL = 0.30 * minDim;
+        const twoSigSq = 2 * SIG * SIG;
+
+        ctx.save();
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, width, height);
+
+        const accentRGB = getThemeRGB();
+
+        // 1st Pass: Compute deformed coordinates and g-weights
+        // Store deformed state in temporary row arrays
+        const deformed = new Array(rows);
+        for (let r = 0; r < rows; r++) {
+          const rowArr = new Array(cols);
+          const baseRow = grid[r];
+          for (let c = 0; c < cols; c++) {
+            const pt = baseRow[c];
+            const dx = easedX - pt.bx;
+            const dy = easedY - pt.by;
+            const distSq = dx * dx + dy * dy;
+            const dist = Math.sqrt(distSq);
+
+            const g = Math.exp(-distSq / twoSigSq);
+
+            let px = pt.bx;
+            let py = pt.by;
+            if (dist > 0.0001) {
+              const pullAmount = g * PULL;
+              px += (dx / dist) * pullAmount;
+              py += (dy / dist) * pullAmount;
+            }
+
+            rowArr[c] = {
+              x: px,
+              y: py,
+              g: g
+            };
+          }
+          deformed[r] = rowArr;
+        }
+
+        // 2nd Pass: Draw lines to right & down
+        // Skip lines whose average g is under 0.004 so far field stays clean
+        ctx.lineWidth = 1.0;
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const p = deformed[r][c];
+
+            // Line to right neighbor
+            if (c + 1 < cols) {
+              const pRight = deformed[r][c + 1];
+              const avgG = (p.g + pRight.g) * 0.5;
+              if (avgG >= 0.004) {
+                const lineAlpha = 0.04 + avgG * 0.62;
+                ctx.strokeStyle = `rgba(${accentRGB}, ${lineAlpha})`;
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(pRight.x, pRight.y);
+                ctx.stroke();
+              }
+            }
+
+            // Line to bottom neighbor
+            if (r + 1 < rows) {
+              const pDown = deformed[r + 1][c];
+              const avgG = (p.g + pDown.g) * 0.5;
+              if (avgG >= 0.004) {
+                const lineAlpha = 0.04 + avgG * 0.62;
+                ctx.strokeStyle = `rgba(${accentRGB}, ${lineAlpha})`;
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(pDown.x, pDown.y);
+                ctx.stroke();
+              }
+            }
+          }
+        }
+
+        // 3rd Pass: Draw dots
+        // dot radius = 0.9 + g * 1.9, dot alpha = 0.16 + g * 0.62
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const p = deformed[r][c];
+            const radius = 0.9 + p.g * 1.9;
+            const alpha = 0.16 + p.g * 0.62;
+
+            ctx.fillStyle = `rgba(${accentRGB}, ${alpha})`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        ctx.restore();
+      }
+
+      requestAnimationFrame(render);
+    })();
+
+    /* ==========================================================
+       PART 2: APPLICATION STATE & MULTI-SCREEN TRANSITIONS
+       Screens:
+         1) Login screen
+         2) Student Information screen
+         3) Main Dashboard screen
+       ========================================================== */
+    const appState = {
+      user: {
+        email: "alex.student@university.edu",
+        name: "Alex Chen",
+        major: "Computer Science",
+        year: "Year 3 (Fall)",
+        routineTone: "Steady",
+        healthGoal: "Circadian Focus"
+      },
+      currentScreen: "screen-login"
+    };
+
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen-view').forEach(screen => {
+        screen.classList.remove('active');
+        screen.style.display = 'none';
+      });
+
+      const target = document.getElementById(screenId);
+      if (target) {
+        target.style.display = 'flex';
+        // Force reflow
+        void target.offsetWidth;
+        target.classList.add('active');
+        appState.currentScreen = screenId;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    // Login Form Submit -> Student Info
+    document.getElementById('login-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      appState.user.email = email;
+      showToast("Identity verified! Complete student profile.", "fa-user-check");
+      showScreen('screen-student-info');
+    });
+
+    // Quick demo access button
+    document.getElementById('btn-quick-guest').addEventListener('click', () => {
+      showToast("Accessing with demo student profile...", "fa-bolt");
+      showScreen('screen-student-info');
+    });
+
+    // Student Health Goal Chips Selection
+    document.querySelectorAll('.choice-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.choice-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        appState.user.healthGoal = chip.getAttribute('data-goal');
+      });
+    });
+
+    // Back to Login
+    document.getElementById('btn-back-to-login').addEventListener('click', () => {
+      showScreen('screen-login');
+    });
+
+    // Student Info Submit -> Dashboard
+    document.getElementById('student-info-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('student-name').value || "Alex Chen";
+      const major = document.getElementById('student-major').value || "Computer Science";
+      const year = document.getElementById('student-year').value || "Year 3";
+      const tonePref = document.getElementById('student-routine-pref').value;
+
+      appState.user.name = name;
+      appState.user.major = major;
+      appState.user.year = year;
+      appState.user.routineTone = tonePref;
+
+      // Update Dashboard Header & Badges
+      document.getElementById('badge-student-name').textContent = name;
+      document.getElementById('badge-student-major').textContent = `${major} (${year})`;
+      const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) || "RB";
+      document.getElementById('user-profile-badge').textContent = initials;
+
+      showToast(`Welcome ${name}! Routine dashboard synchronized.`, "fa-graduation-cap");
+      showScreen('screen-dashboard');
+      
+      // Apply chosen initial tone
+      setTone(tonePref.toLowerCase());
+    });
+
+    // Logout / Switch Account
+    document.getElementById('switch-account-btn').addEventListener('click', () => {
+      showToast("Returned to Student Profile setup", "fa-user-pen");
+      showScreen('screen-student-info');
+    });
+
+    document.getElementById('dashboard-brand-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      showToast("Active session: Routine Balance Dashboard", "fa-sparkles");
+    });
+
+    /* ==========================================================
+       PART 3: 10 DAYS INTERACTIVE ROUTINE & WELLNESS DATA
+       - All tasks and commitments start clean/uncompleted so the student
+         can check them off in real time as they complete them.
+       ========================================================== */
+    const daysData = {
+      1: {
+        title: "Day 1",
+        dateText: "Tuesday, October 13",
+        shortDesc: "Today's Plan",
+        score: 0,
+        scoreHeading: "Ready to start",
+        scoreDescription: "Today's structure is planned. Complete each commitment to build momentum and watch your score climb.",
+        scoreTag: "A fresh start awaits.",
+        focusWindows: "90 min",
+        recoveryTime: "160 min",
+        openLoops: 9,
+        energy: 70,
+        sleep: 7.5,
+        tone: "steady",
+        commitments: [
+          { id: "c1", title: "Morning reset & lecture prep", time: "7:30 AM · 30 min", done: false, icon: "fa-sun" },
+          { id: "c2", title: "Deep code architecture block", time: "9:00 AM · 90 min", done: false, icon: "fa-bullseye" },
+          { id: "c3", title: "Nutritious lunch away from desk", time: "12:30 PM · 45 min", done: false, icon: "fa-utensils" },
+          { id: "c4", title: "Campus walk & spine mobility", time: "2:00 PM · 25 min", done: false, icon: "fa-person-walking" }
+        ],
+        schedule: [
+          { id: "s1", time: "7:30 AM", plan: "Morning calm & hydration", intention: "Wakeful grounding", status: "Scheduled", notes: "Hydrate with 500ml water and 10 mins light stretching to awaken your body." },
+          { id: "s2", time: "9:00 AM", plan: "Deep work sprint (Algorithms Project)", intention: "High cognitive focus", status: "Scheduled", notes: "Clear primary tree parsing block without notification interruption." },
+          { id: "s3", time: "12:30 PM", plan: "Campus courtyard lunch & sunlight", intention: "Restorative recharge", status: "Scheduled", notes: "Enjoy balanced quinoa bowl in outdoor air to stabilize blood sugar." },
+          { id: "s4", time: "2:00 PM", plan: "Brisk walk & mobility", intention: "Physical movement", status: "Scheduled", notes: "Aim for 2,000+ steps to relieve lower back stiffness." },
+          { id: "s5", time: "4:30 PM", plan: "Lab wrap-up & inbox zero", intention: "Closure & peace", status: "Scheduled", notes: "Organize tomorrow's top 2 priorities and log off on time." }
+        ]
+      },
+      2: {
+        title: "Day 2",
+        dateText: "Wednesday, October 14",
+        shortDesc: "Upcoming",
+        score: 0,
+        scoreHeading: "Low stamina buffer",
+        scoreDescription: "Paced day planned. Protect space and take restorative breaks to prevent burnout.",
+        scoreTag: "Rest is productive work.",
+        focusWindows: "45 min",
+        recoveryTime: "210 min",
+        openLoops: 8,
+        energy: 45,
+        sleep: 6.0,
+        tone: "low-key",
+        commitments: [
+          { id: "c1", title: "Hydrate and sunlight", time: "8:00 AM · 20 min", done: false, icon: "fa-sun" },
+          { id: "c2", title: "Gentle lecture notes review", time: "10:30 AM · 45 min", done: false, icon: "fa-book-open" },
+          { id: "c3", title: "Afternoon nap / rest buffer", time: "2:00 PM · 40 min", done: false, icon: "fa-bed" }
+        ],
+        schedule: [
+          { id: "s1", time: "8:00 AM", plan: "Warm herbal tea & light daylight", intention: "Gentle awakening", status: "Scheduled", notes: "Sunlight exposure to gently trigger cortisol awakening response." },
+          { id: "s2", time: "10:30 AM", plan: "Low-intensity document review", intention: "Low cognitive load", status: "Scheduled", notes: "Review copy without heavy decision fatigue." },
+          { id: "s3", time: "1:00 PM", plan: "Quiet lunch & herbal recovery", intention: "Nourishment", status: "Scheduled", notes: "Steamed greens and warm broth soup." },
+          { id: "s4", time: "2:00 PM", plan: "Restful buffer / horizontal rest", intention: "Deep recovery", status: "Scheduled", notes: "Eyes closed for 25 mins to restore central nervous system." },
+          { id: "s5", time: "5:00 PM", plan: "Early shutdown", intention: "Preserve sleep drive", status: "Scheduled", notes: "Dimming blue screens to encourage early melatonin release." }
+        ]
+      },
+      3: {
+        title: "Day 3",
+        dateText: "Thursday, October 15",
+        shortDesc: "Upcoming",
+        score: 0,
+        scoreHeading: "High flow day",
+        scoreDescription: "Solid focus blocks and well-spaced restorative breaks prepared for peak performance.",
+        scoreTag: "Flow with sustainable energy.",
+        focusWindows: "120 min",
+        recoveryTime: "130 min",
+        openLoops: 8,
+        energy: 85,
+        sleep: 8.0,
+        tone: "bright",
+        commitments: [
+          { id: "c1", title: "Gym strength workout", time: "7:00 AM · 45 min", done: false, icon: "fa-dumbbell" },
+          { id: "c2", title: "Deep coding sprint", time: "9:30 AM · 90 min", done: false, icon: "fa-code" },
+          { id: "c3", title: "Green smoothie recharge", time: "12:00 PM · 20 min", done: false, icon: "fa-apple-whole" },
+          { id: "c4", title: "Student project team sync", time: "3:00 PM · 30 min", done: false, icon: "fa-users" }
+        ],
+        schedule: [
+          { id: "s1", time: "7:00 AM", plan: "Strength circuit & cold finish shower", intention: "Vigor & vitality", status: "Scheduled", notes: "Aim for compound lifts to stimulate dopamine and focus." },
+          { id: "s2", time: "9:30 AM", plan: "Sprint: Key feature deliverables", intention: "Deep focus", status: "Scheduled", notes: "Finish critical API integration without distractions." },
+          { id: "s3", time: "1:00 PM", plan: "Protein-rich meal & mindfulness", intention: "Metabolic boost", status: "Scheduled", notes: "High protein lunch with avocado and spinach." },
+          { id: "s4", time: "3:00 PM", plan: "Collaborative team sync", intention: "Interpersonal energy", status: "Scheduled", notes: "Align on sprint milestones with research group." }
+        ]
+      },
+      4: {
+        title: "Day 4",
+        dateText: "Friday, October 16",
+        shortDesc: "Upcoming",
+        score: 0,
+        scoreHeading: "Consistent excellence",
+        scoreDescription: "Balanced workload with zero unnecessary cognitive overload planned.",
+        scoreTag: "Clarity over hustle.",
+        focusWindows: "105 min",
+        recoveryTime: "140 min",
+        openLoops: 7,
+        energy: 80,
+        sleep: 7.8,
+        tone: "steady",
+        commitments: [
+          { id: "c1", title: "Weekly review & cleanup", time: "9:00 AM · 60 min", done: false, icon: "fa-clipboard-check" },
+          { id: "c2", title: "Walking call with professor", time: "11:30 AM · 40 min", done: false, icon: "fa-phone" },
+          { id: "c3", title: "Disconnect digital screens", time: "6:00 PM · evening", done: false, icon: "fa-power-off" }
+        ],
+        schedule: [
+          { id: "s1", time: "9:00 AM", plan: "Weekly retrospective & planning", intention: "Strategic clarity", status: "Scheduled", notes: "Review course milestones and tie up loose threads." },
+          { id: "s2", time: "11:30 AM", plan: "Outdoor walking discussion", intention: "Active collaboration", status: "Scheduled", notes: "Discuss research roadmap outdoors in fresh air." },
+          { id: "s3", time: "2:00 PM", plan: "Creative writing & ideation", intention: "Creative flow", status: "Scheduled", notes: "Draft project design document." },
+          { id: "s4", time: "5:30 PM", plan: "Weekend transition ritual", intention: "Boundary setting", status: "Scheduled", notes: "Close workspace apps and set away status." }
+        ]
+      },
+      5: {
+        title: "Day 5",
+        dateText: "Saturday, October 17",
+        shortDesc: "Upcoming",
+        score: 0,
+        scoreHeading: "Restful restoration",
+        scoreDescription: "Slow start scheduled to allow natural nervous system recovery.",
+        scoreTag: "Listening to your body.",
+        focusWindows: "30 min",
+        recoveryTime: "240 min",
+        openLoops: 4,
+        energy: 55,
+        sleep: 8.5,
+        tone: "low-key",
+        commitments: [
+          { id: "c1", title: "Slow morning & reading", time: "9:00 AM · 60 min", done: false, icon: "fa-book" },
+          { id: "c2", title: "Nature hike in park", time: "1:00 PM · 90 min", done: false, icon: "fa-tree" }
+        ],
+        schedule: [
+          { id: "s1", time: "9:00 AM", plan: "Unstructured reading & coffee", intention: "Mental spaciousness", status: "Scheduled", notes: "Read non-fiction without any deadline rush." },
+          { id: "s2", time: "1:00 PM", plan: "Trail walk in nature", intention: "Grounding recovery", status: "Scheduled", notes: "Absorb natural sunlight and tranquil outdoor atmosphere." }
+        ]
+      },
+      6: {
+        title: "Day 6",
+        dateText: "Sunday, October 18",
+        shortDesc: "Upcoming",
+        score: 0,
+        scoreHeading: "Recharging reserves",
+        scoreDescription: "Meal prep and gentle restorative rituals ready for the new week.",
+        scoreTag: "Peaceful reset.",
+        focusWindows: "30 min",
+        recoveryTime: "260 min",
+        openLoops: 4,
+        energy: 60,
+        sleep: 8.8,
+        tone: "low-key",
+        commitments: [
+          { id: "c1", title: "Healthy meal prep", time: "11:00 AM · 60 min", done: false, icon: "fa-carrot" },
+          { id: "c2", title: "Evening stretch & warm bath", time: "8:00 PM · 45 min", done: false, icon: "fa-bath" }
+        ],
+        schedule: [
+          { id: "s1", time: "11:00 AM", plan: "Nutrient prep for upcoming week", intention: "Self-nourishment", status: "Scheduled", notes: "Cook roasted sweet potatoes, quinoa, and protein." },
+          { id: "s2", time: "8:00 PM", plan: "Epsom salt soak & mobility", intention: "Parasympathetic tone", status: "Scheduled", notes: "Magnesium bath to ease muscular tension and prepare for deep sleep." }
+        ]
+      },
+      7: {
+        title: "Day 7",
+        dateText: "Monday, October 19",
+        shortDesc: "Upcoming",
+        score: 0,
+        scoreHeading: "Gentle re-entry",
+        scoreDescription: "Paced re-entry into the academic week without shock to your rhythm.",
+        scoreTag: "Pacing beats rushing.",
+        focusWindows: "75 min",
+        recoveryTime: "180 min",
+        openLoops: 5,
+        energy: 65,
+        sleep: 7.2,
+        tone: "steady",
+        commitments: [
+          { id: "c1", title: "Monday priorities setup", time: "9:00 AM · 30 min", done: false, icon: "fa-bullseye" },
+          { id: "c2", title: "Study focus session 1", time: "10:30 AM · 75 min", done: false, icon: "fa-laptop" }
+        ],
+        schedule: [
+          { id: "s1", time: "9:00 AM", plan: "Weekly roadmap review", intention: "Calm organization", status: "Scheduled", notes: "Organize top 3 priorities for the week." },
+          { id: "s2", time: "10:30 AM", plan: "Deep block on thesis roadmap", intention: "Focused output", status: "Scheduled", notes: "Draft sections with single-task concentration." },
+          { id: "s3", time: "3:30 PM", plan: "Afternoon walking break", intention: "Re-oxygenate", status: "Scheduled", notes: "20 min outdoor walk around campus." }
+        ]
+      },
+      8: {
+        title: "Day 8",
+        dateText: "Tuesday, October 20",
+        shortDesc: "Upcoming",
+        score: 0,
+        scoreHeading: "Steady progress",
+        scoreDescription: "Moderate workload with balanced recovery buffers planned.",
+        scoreTag: "Small steps forward.",
+        focusWindows: "60 min",
+        recoveryTime: "170 min",
+        openLoops: 4,
+        energy: 65,
+        sleep: 7.0,
+        tone: "steady",
+        commitments: [
+          { id: "c1", title: "Mid-day yoga stretch", time: "12:30 PM · 25 min", done: false, icon: "fa-child-reaching" },
+          { id: "c2", title: "Finish design updates", time: "2:00 PM · 60 min", done: false, icon: "fa-pen-ruler" }
+        ],
+        schedule: [
+          { id: "s1", time: "10:00 AM", plan: "Review lab feedback", intention: "Feedback incorporation", status: "Scheduled", notes: "Categorize suggestions from advisor." },
+          { id: "s2", time: "2:00 PM", plan: "Lab sprint", intention: "Creative focus", status: "Scheduled", notes: "Refactor UI test suites." }
+        ]
+      },
+      9: {
+        title: "Day 9",
+        dateText: "Wednesday, October 21",
+        shortDesc: "Upcoming",
+        score: 0,
+        scoreHeading: "Conserving stamina",
+        scoreDescription: "Simplified schedule to maintain energy sustainability.",
+        scoreTag: "Essentialism in action.",
+        focusWindows: "50 min",
+        recoveryTime: "190 min",
+        openLoops: 4,
+        energy: 60,
+        sleep: 7.4,
+        tone: "low-key",
+        commitments: [
+          { id: "c1", title: "Brief morning walk", time: "8:30 AM · 20 min", done: false, icon: "fa-person-walking" },
+          { id: "c2", title: "Early bedtime routine", time: "9:30 PM · 30 min", done: false, icon: "fa-moon" }
+        ],
+        schedule: [
+          { id: "s1", time: "9:30 AM", plan: "Documentation updates", intention: "Steady maintenance", status: "Scheduled", notes: "Clean up coursework documentation." },
+          { id: "s2", time: "2:30 PM", plan: "Quiet reading and tea", intention: "Rest", status: "Scheduled", notes: "Enjoy calming chamomile tea." }
+        ]
+      },
+      10: {
+        title: "Day 10",
+        dateText: "Thursday, October 22",
+        shortDesc: "Upcoming",
+        score: 0,
+        scoreHeading: "Peak execution day",
+        scoreDescription: "Final sprint planned. High energy alignment ready for completion.",
+        scoreTag: "A system that works for you.",
+        focusWindows: "110 min",
+        recoveryTime: "150 min",
+        openLoops: 6,
+        energy: 85,
+        sleep: 8.2,
+        tone: "bright",
+        commitments: [
+          { id: "c1", title: "Sunrise workout", time: "6:45 AM · 40 min", done: false, icon: "fa-bolt" },
+          { id: "c2", title: "Final assignment submission", time: "10:00 AM · 90 min", done: false, icon: "fa-rocket" },
+          { id: "c3", title: "Celebratory dinner", time: "7:00 PM · 60 min", done: false, icon: "fa-champagne-glasses" }
+        ],
+        schedule: [
+          { id: "s1", time: "6:45 AM", plan: "Cardio interval & gratitude journal", intention: "Peak state activation", status: "Scheduled", notes: "Peak state cardio workout followed by reflection." },
+          { id: "s2", time: "10:00 AM", plan: "Submission sprint", intention: "Precision execution", status: "Scheduled", notes: "Deliver coursework cleanly." },
+          { id: "s3", time: "2:30 PM", plan: "Celebration campus stroll", intention: "Bonding", status: "Scheduled", notes: "Relaxed 30 min campus walk." }
+        ]
+      }
+    };
+
+    let activeDay = 1;
+
+    /* ==========================================================
+       PART 4: DASHBOARD UI CONTROLLERS
+       ========================================================== */
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const themeIcon = document.getElementById('theme-icon');
+    const daysTimeline = document.getElementById('days-timeline');
+    const headerDate = document.getElementById('header-date');
+    const currentDayLabel = document.getElementById('current-day-label');
+    const scoreHeading = document.getElementById('score-heading');
+    const scoreDescription = document.getElementById('score-description');
+    const balanceScoreNum = document.getElementById('balance-score-num');
+    const progressCircleBar = document.getElementById('progress-circle-bar');
+    const scoreTagText = document.getElementById('score-tag-text');
+    const focusTimeStat = document.getElementById('focus-time-stat');
+    const recoveryTimeStat = document.getElementById('recovery-time-stat');
+    const openLoopsStat = document.getElementById('open-loops-stat');
+
+    const signalEnergyVal = document.getElementById('signal-energy-val');
+    const signalEnergyBar = document.getElementById('signal-energy-bar');
+    const signalSleepVal = document.getElementById('signal-sleep-val');
+    const signalSleepBar = document.getElementById('signal-sleep-bar');
+    const signalRecoveryVal = document.getElementById('signal-recovery-val');
+    const signalRecoveryBar = document.getElementById('signal-recovery-bar');
+
+    const energySlider = document.getElementById('energy-slider');
+    const energyValDisplay = document.getElementById('energy-val-display');
+    const sleepSlider = document.getElementById('sleep-slider');
+    const sleepValDisplay = document.getElementById('sleep-val-display');
+
+    const tonePills = document.querySelectorAll('.tone-pill');
+    const commitmentsContainer = document.getElementById('commitments-container');
+    const scheduleTbody = document.getElementById('schedule-tbody');
+    const toastContainer = document.getElementById('toast-container');
+
+    const coachModal = document.getElementById('coach-modal');
+    const openCoachBtn = document.getElementById('open-coach-btn');
+    const quickCoachBtn = document.getElementById('quick-coach-btn');
+    const coachModalClose = document.getElementById('coach-modal-close');
+    const coachTabs = document.querySelectorAll('.coach-tab-btn');
+    const coachEnergyDiagnosis = document.getElementById('coach-energy-diagnosis');
+    const applyAiRoutineBtn = document.getElementById('apply-ai-routine-btn');
+    const coachUserInput = document.getElementById('coach-user-input');
+    const coachSendBtn = document.getElementById('coach-send-btn');
+    const coachChatBox = document.getElementById('coach-chat-box');
+
+    const statusModal = document.getElementById('status-modal');
+    const statusModalClose = document.getElementById('status-modal-close');
+    const statusModalTitle = document.getElementById('status-modal-title');
+    const statusModalBody = document.getElementById('status-modal-body');
+
+    function showToast(message, icon = 'fa-circle-check') {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `<i class="fa-solid ${icon}" style="color: var(--accent);"></i> <span>${message}</span>`;
+      toastContainer.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // Toggle dark/light theme
+    function toggleTheme() {
+      const currentTheme = document.body.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', newTheme);
+      
+      if (newTheme === 'dark') {
+        themeIcon.className = 'fa-solid fa-moon';
+        showToast('Night mode enabled', 'fa-moon');
+      } else {
+        themeIcon.className = 'fa-solid fa-sun';
+        showToast('Daylight mode enabled', 'fa-sun');
+      }
+    }
+
+    // Set feeling tone
+    function setTone(tone) {
+      document.body.setAttribute('data-tone', tone);
+      tonePills.forEach(p => {
+        if (p.getAttribute('data-tone') === tone) {
+          p.classList.add('active');
+        } else {
+          p.classList.remove('active');
+        }
+      });
+
+      daysData[activeDay].tone = tone;
+      updateCoachDiagnosis();
+    }
+
+    // Days timeline
+    function renderDaysNav() {
+      daysTimeline.innerHTML = '';
+      for (let i = 1; i <= 10; i++) {
+        const d = daysData[i];
+        const chip = document.createElement('div');
+        chip.className = `day-chip ${i === activeDay ? 'active' : ''}`;
+        chip.id = `day-chip-${i}`;
+        chip.innerHTML = `
+          <div class="day-chip-title">Day ${i}</div>
+          <div class="day-chip-desc">${d.shortDesc}</div>
+        `;
+        chip.addEventListener('click', () => switchDay(i));
+        daysTimeline.appendChild(chip);
+      }
+    }
+
+    function switchDay(dayNum) {
+      if (activeDay === dayNum) return;
+      activeDay = dayNum;
+
+      document.querySelectorAll('.day-chip').forEach((c, idx) => {
+        if (idx + 1 === dayNum) {
+          c.classList.add('active');
+          c.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        } else {
+          c.classList.remove('active');
+        }
+      });
+
+      loadDayData(dayNum);
+      showToast(`Loaded ${daysData[dayNum].title}: ${daysData[dayNum].shortDesc}`, 'fa-calendar-day');
+    }
+
+    function loadDayData(dayNum) {
+      const data = daysData[dayNum];
+
+      headerDate.textContent = data.dateText;
+      currentDayLabel.textContent = `${data.title} • ${data.dateText.split(',')[1] || data.dateText}`;
+      
+      balanceScoreNum.textContent = data.score;
+      scoreHeading.textContent = data.scoreHeading;
+      scoreDescription.textContent = data.scoreDescription;
+      scoreTagText.textContent = data.scoreTag;
+
+      const circumference = 2 * Math.PI * 45;
+      const offset = circumference - (data.score / 100) * circumference;
+      progressCircleBar.style.strokeDashoffset = offset;
+
+      focusTimeStat.textContent = data.focusWindows;
+      recoveryTimeStat.textContent = data.recoveryTime;
+      openLoopsStat.textContent = data.openLoops;
+
+      energySlider.value = data.energy;
+      energyValDisplay.textContent = `${data.energy}%`;
+      sleepSlider.value = data.sleep;
+      sleepValDisplay.textContent = `${data.sleep} h`;
+
+      signalEnergyVal.textContent = `${data.energy}%`;
+      signalEnergyBar.style.width = `${data.energy}%`;
+
+      const sleepPercent = Math.min(100, Math.round((data.sleep / 8) * 100));
+      signalSleepVal.textContent = `${sleepPercent}%`;
+      signalSleepBar.style.width = `${sleepPercent}%`;
+
+      const recoveryPercent = Math.min(100, Math.round((data.energy * 0.5) + (sleepPercent * 0.5)));
+      signalRecoveryVal.textContent = `${recoveryPercent}%`;
+      signalRecoveryBar.style.width = `${recoveryPercent}%`;
+
+      setTone(data.tone || 'steady');
+      renderCommitments(data.commitments);
+      renderSchedule(data.schedule);
+      updateCoachDiagnosis();
+    }
+
+    function renderCommitments(list) {
+      commitmentsContainer.innerHTML = '';
+      if (!list || list.length === 0) {
+        commitmentsContainer.innerHTML = '<div style="color: var(--text-dim); font-size: 0.8rem; text-align: center; padding: 10px;">No commitments added yet.</div>';
+        return;
+      }
+
+      list.forEach((item) => {
+        const div = document.createElement('div');
+        div.className = 'commitment-item';
+        div.innerHTML = `
+          <div class="commitment-left">
+            <div class="commitment-icon"><i class="fa-solid ${item.icon || 'fa-check'}"></i></div>
+            <div class="commitment-details">
+              <h4 class="${item.done ? 'done' : ''}">${item.title}</h4>
+              <p>${item.time}</p>
+            </div>
+          </div>
+          <button class="check-btn ${item.done ? 'checked' : ''}" title="Toggle Complete" aria-label="Toggle Complete">
+            <i class="fa-solid fa-check"></i>
+          </button>
+        `;
+
+        const checkBtn = div.querySelector('.check-btn');
+        checkBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          item.done = !item.done;
+          checkBtn.classList.toggle('checked', item.done);
+          div.querySelector('h4').classList.toggle('done', item.done);
+          
+          recalcDayStats();
+          showToast(`Commitment marked ${item.done ? 'completed' : 'pending'}`, 'fa-circle-check');
+        });
+
+        commitmentsContainer.appendChild(div);
+      });
+    }
+
+    function renderSchedule(schedule) {
+      scheduleTbody.innerHTML = '';
+      if (!schedule || schedule.length === 0) {
+        scheduleTbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 18px; color: var(--text-dim);">No gentle structure items.</td></tr>';
+        return;
+      }
+
+      schedule.forEach((item) => {
+        const tr = document.createElement('tr');
+        const badgeClass = item.status === 'Completed' ? 'completed' : (item.status === 'In Progress' ? 'in-progress' : 'scheduled');
+        
+        tr.innerHTML = `
+          <td><strong>${item.time}</strong></td>
+          <td style="font-weight: 600; color: var(--text-main);">${item.plan}</td>
+          <td>${item.intention}</td>
+          <td>
+            <span class="status-badge ${badgeClass}" title="Click to view activity status report">
+              <i class="fa-solid ${item.status === 'Completed' ? 'fa-circle-check' : (item.status === 'In Progress' ? 'fa-spinner' : 'fa-clock')}"></i>
+              ${item.status}
+            </span>
+          </td>
+        `;
+
+        tr.addEventListener('click', () => openStatusReport(item));
+        scheduleTbody.appendChild(tr);
+      });
+    }
+
+    function openStatusReport(item) {
+      statusModalTitle.innerHTML = `<i class="fa-solid fa-file-waveform" style="color: var(--accent);"></i> Activity Status Report: ${item.plan}`;
+      statusModalBody.innerHTML = `
+        <div style="background: var(--bg-card); padding: 18px; border-radius: 12px; border: 1px solid var(--border-color);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="font-size: 0.85rem; color: var(--text-muted);"><i class="fa-regular fa-clock"></i> Scheduled Time: <strong style="color: var(--text-main);">${item.time}</strong></div>
+            <span class="status-badge ${item.status === 'Completed' ? 'completed' : (item.status === 'In Progress' ? 'in-progress' : 'scheduled')}">
+              ${item.status}
+            </span>
+          </div>
+
+          <div style="margin-bottom: 14px;">
+            <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--text-dim); font-weight: 700; margin-bottom: 4px;">Energy & Intention</div>
+            <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-main);">${item.intention}</div>
+          </div>
+
+          <div style="margin-bottom: 14px;">
+            <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--text-dim); font-weight: 700; margin-bottom: 4px;">Coach & Activity Notes</div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">${item.notes || 'Activity tracked smoothly according to circadian rhythm plan.'}</p>
+          </div>
+
+          <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border-subtle); display: flex; gap: 8px; justify-content: flex-end;">
+            <button class="btn-secondary" id="toggle-status-quick-btn">
+              Change to ${item.status === 'Completed' ? 'In Progress' : 'Completed'}
+            </button>
+            <button class="btn-primary" id="status-done-btn">Acknowledge</button>
+          </div>
+        </div>
+      `;
+
+      statusModal.classList.add('active');
+
+      document.getElementById('status-done-btn').onclick = () => {
+        statusModal.classList.remove('active');
+      };
+
+      document.getElementById('toggle-status-quick-btn').onclick = () => {
+        item.status = item.status === 'Completed' ? 'In Progress' : 'Completed';
+        renderSchedule(daysData[activeDay].schedule);
+        recalcDayStats();
+        statusModal.classList.remove('active');
+        showToast(`Status updated to "${item.status}"`, 'fa-circle-check');
+      };
+    }
+
+    function recalcDayStats() {
+      const d = daysData[activeDay];
+      const uncompletedCommitments = d.commitments.filter(c => !c.done).length;
+      const uncompletedSchedule = d.schedule.filter(s => s.status !== 'Completed').length;
+      d.openLoops = uncompletedCommitments + uncompletedSchedule;
+      openLoopsStat.textContent = d.openLoops;
+
+      const totalItems = d.commitments.length + d.schedule.length;
+      const completedItems = d.commitments.filter(c => c.done).length + d.schedule.filter(s => s.status === 'Completed').length;
+      if (totalItems > 0) {
+        d.score = Math.round((completedItems / totalItems) * 100);
+      } else {
+        d.score = 0;
+      }
+      balanceScoreNum.textContent = d.score;
+      const circumference = 2 * Math.PI * 45;
+      const offset = circumference - (d.score / 100) * circumference;
+      progressCircleBar.style.strokeDashoffset = offset;
+
+      // Update Dynamic heading, description and badge based on score
+      if (d.score === 100) {
+        d.scoreHeading = "Work is done";
+        d.scoreDescription = "You completed all commitments and routines for today! Take the win and carry peaceful clarity into tomorrow.";
+        d.scoreTag = "100% Completed — Stellar Effort!";
+        d.shortDesc = "Done";
+      } else if (d.score > 60) {
+        d.scoreHeading = "Strong momentum";
+        d.scoreDescription = `You have completed ${completedItems} of ${totalItems} items. Maintain this sustainable pace without straining.`;
+        d.scoreTag = `${d.score}% in progress`;
+        d.shortDesc = `${d.score}% Done`;
+      } else if (d.score > 0) {
+        d.scoreHeading = "Day in progress";
+        d.scoreDescription = `Off to a good start! ${completedItems} item checked off. Take one gentle step at a time.`;
+        d.scoreTag = "Keep going";
+        d.shortDesc = "In progress";
+      } else {
+        d.scoreHeading = "Ready to start";
+        d.scoreDescription = "Today's structure is planned. Complete each commitment to build momentum and watch your score climb.";
+        d.scoreTag = "A fresh start awaits.";
+        d.shortDesc = "Today's Plan";
+      }
+
+      scoreHeading.textContent = d.scoreHeading;
+      scoreDescription.textContent = d.scoreDescription;
+      scoreTagText.textContent = d.scoreTag;
+
+      // Update timeline chip label for active day
+      const chipDesc = document.querySelector(`#day-chip-${activeDay} .day-chip-desc`);
+      if (chipDesc) {
+        chipDesc.textContent = d.shortDesc;
+      }
+    }
+
+    function renderWeeklyChart() {
+      const chartContainer = document.getElementById('weekly-chart-bars');
+      chartContainer.innerHTML = '';
+      const days = [
+        { label: 'Mon', score: 68 },
+        { label: 'Tue', score: 100, highlight: true },
+        { label: 'Wed', score: 52 },
+        { label: 'Thu', score: 88 },
+        { label: 'Fri', score: 92 },
+        { label: 'Sat', score: 74 },
+        { label: 'Sun', score: 70 }
+      ];
+
+      days.forEach(d => {
+        const col = document.createElement('div');
+        col.className = 'chart-col';
+        col.innerHTML = `
+          <div class="chart-bar-outer">
+            <div class="chart-bar-inner ${d.highlight ? 'highlight' : ''}" style="height: ${Math.round(d.score * 0.65)}px;"></div>
+          </div>
+          <span class="chart-day-label">${d.label}</span>
+        `;
+        chartContainer.appendChild(col);
+      });
+    }
+
+    function updateCoachDiagnosis() {
+      const d = daysData[activeDay];
+      const eng = d.energy;
+      const slp = d.sleep;
+      
+      let diagnosis = `Current energy is ${eng}% with ${slp}h sleep for student ${appState.user.name}. `;
+      if (eng < 50) {
+        diagnosis += `Your system is in energy preservation mode. We shifted your focus windows to low-strain 30-min sprints, added 200+ min of recovery buffer, and recommended a high-protein warm meal.`;
+      } else if (eng >= 80) {
+        diagnosis += `You have strong cognitive momentum! Recommended 90-120 min flow sprints, optimal cold-water hydration, and a brisk 25-min outdoor campus walk before 4 PM.`;
+      } else {
+        diagnosis += `Steady balance detected. Keep 90 min deep study blocks, insert afternoon sunlight walks, and sustain steady blood sugar with walnuts, berries, and matcha.`;
+      }
+      coachEnergyDiagnosis.textContent = diagnosis;
+    }
+
+    function setupDashboardEvents() {
+      themeToggleBtn.addEventListener('click', toggleTheme);
+
+      tonePills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          setTone(pill.getAttribute('data-tone'));
+          showToast(`Tone updated to ${pill.textContent}`, 'fa-sliders');
+        });
+      });
+
+      energySlider.addEventListener('input', (e) => {
+        const val = e.target.value;
+        energyValDisplay.textContent = `${val}%`;
+        signalEnergyVal.textContent = `${val}%`;
+        signalEnergyBar.style.width = `${val}%`;
+        daysData[activeDay].energy = parseInt(val);
+        updateRecoverySignal();
+        updateCoachDiagnosis();
+      });
+
+      sleepSlider.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value).toFixed(1);
+        sleepValDisplay.textContent = `${val} h`;
+        const pct = Math.min(100, Math.round((val / 8.0) * 100));
+        signalSleepVal.textContent = `${pct}%`;
+        signalSleepBar.style.width = `${pct}%`;
+        daysData[activeDay].sleep = parseFloat(val);
+        updateRecoverySignal();
+        updateCoachDiagnosis();
+      });
+
+      function updateRecoverySignal() {
+        const d = daysData[activeDay];
+        const sleepPct = Math.min(100, Math.round((d.sleep / 8) * 100));
+        const rec = Math.min(100, Math.round((d.energy * 0.5) + (sleepPct * 0.5)));
+        signalRecoveryVal.textContent = `${rec}%`;
+        signalRecoveryBar.style.width = `${rec}%`;
+      }
+
+      const openCoach = () => {
+        coachModal.classList.add('active');
+        updateCoachDiagnosis();
+      };
+
+      openCoachBtn.addEventListener('click', openCoach);
+      quickCoachBtn.addEventListener('click', openCoach);
+
+      coachModalClose.addEventListener('click', () => coachModal.classList.remove('active'));
+      statusModalClose.addEventListener('click', () => statusModal.classList.remove('active'));
+
+      coachModal.addEventListener('click', (e) => {
+        if (e.target === coachModal) coachModal.classList.remove('active');
+      });
+      statusModal.addEventListener('click', (e) => {
+        if (e.target === statusModal) statusModal.classList.remove('active');
+      });
+
+      coachTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          coachTabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          const target = tab.getAttribute('data-tab');
+
+          document.getElementById('content-balance').style.display = target === 'balance' ? 'block' : 'none';
+          document.getElementById('content-exercise').style.display = target === 'exercise' ? 'block' : 'none';
+          document.getElementById('content-nutrition').style.display = target === 'nutrition' ? 'block' : 'none';
+          document.getElementById('content-chat').style.display = target === 'chat' ? 'block' : 'none';
+        });
+      });
+
+      applyAiRoutineBtn.addEventListener('click', () => {
+        const d = daysData[activeDay];
+        d.schedule.push({
+          id: `s-${Date.now()}`,
+          time: '3:30 PM',
+          plan: 'AI Recovery Campus Stroll & Hydration',
+          intention: 'Restorative alignment',
+          status: 'Scheduled',
+          notes: 'Added automatically by RoutineBalance AI Coach.'
+        });
+        renderSchedule(d.schedule);
+        recalcDayStats();
+        coachModal.classList.remove('active');
+        showToast('AI Optimized Routine applied to your schedule!', 'fa-wand-magic-sparkles');
+      });
+
+      document.querySelectorAll('.add-to-routine-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const title = btn.getAttribute('data-title');
+          const time = btn.getAttribute('data-time') || '2:30 PM';
+          const dur = btn.getAttribute('data-dur') || '15 min';
+
+          daysData[activeDay].commitments.push({
+            id: `c-${Date.now()}`,
+            title: title,
+            time: `${time} · ${dur}`,
+            done: false,
+            icon: 'fa-heart-pulse'
+          });
+
+          renderCommitments(daysData[activeDay].commitments);
+          recalcDayStats();
+          coachModal.classList.remove('active');
+          showToast(`Added "${title}" to commitments!`, 'fa-plus');
+        });
+      });
+
+      // AI Chat interaction
+      const sendCoachMessage = () => {
+        const text = coachUserInput.value.trim();
+        if (!text) return;
+
+        const userMsg = document.createElement('div');
+        userMsg.className = 'coach-msg';
+        userMsg.style.justifyContent = 'flex-end';
+        userMsg.innerHTML = `
+          <div class="coach-msg-bubble" style="background: var(--accent-chip); border-color: var(--accent); border-top-right-radius: 2px; border-top-left-radius: 14px;">
+            ${text}
+          </div>
+        `;
+        coachChatBox.appendChild(userMsg);
+        coachUserInput.value = '';
+
+        setTimeout(() => {
+          const reply = document.createElement('div');
+          reply.className = 'coach-msg';
+          let responseText = '';
+
+          const lower = text.toLowerCase();
+          if (lower.includes('exercise') || lower.includes('workout') || lower.includes('gym')) {
+            responseText = `Based on your ${daysData[activeDay].energy}% energy score today, I suggest a <strong>15-minute campus mobility walk</strong> or core decomp circuit rather than exhausting cardio.`;
+          } else if (lower.includes('eat') || lower.includes('food') || lower.includes('snack') || lower.includes('nutrition')) {
+            responseText = `For steady brain stamina, grab <strong>walnuts, dark blueberries, and hot green tea with honey</strong>. It sustains concentration without insulin crashes.`;
+          } else if (lower.includes('exam') || lower.includes('study') || lower.includes('focus')) {
+            responseText = `Divide your study sessions into <strong>50-minute Pomodoro focus windows with 10-minute eye rests</strong> away from your screens!`;
+          } else {
+            responseText = `I've analyzed your daily balance parameters. Your schedule is configured with <strong>${daysData[activeDay].focusWindows} focus</strong> and <strong>${daysData[activeDay].recoveryTime} recovery</strong>. Steady pacing beats late-night cramps!`;
+          }
+
+          reply.innerHTML = `
+            <div class="coach-msg-avatar"><i class="fa-solid fa-robot"></i></div>
+            <div class="coach-msg-bubble">${responseText}</div>
+          `;
+          coachChatBox.appendChild(reply);
+          coachChatBox.scrollTop = coachChatBox.scrollHeight;
+        }, 500);
+      };
+
+      coachSendBtn.addEventListener('click', sendCoachMessage);
+      coachUserInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendCoachMessage();
+      });
+
+      document.getElementById('add-commitment-btn').addEventListener('click', () => {
+        const title = prompt("Enter commitment title (e.g. 15-min mindfulness or campus walk):", "Afternoon stretch & review");
+        if (title) {
+          daysData[activeDay].commitments.push({
+            id: `c-${Date.now()}`,
+            title: title,
+            time: "3:30 PM · 20 min",
+            done: false,
+            icon: 'fa-check'
+          });
+          renderCommitments(daysData[activeDay].commitments);
+          recalcDayStats();
+          showToast(`Commitment "${title}" added!`, 'fa-circle-check');
+        }
+      });
+
+      document.getElementById('save-day-btn').addEventListener('click', () => {
+        showToast(`Saved Day ${activeDay} progress successfully!`, 'fa-floppy-disk');
+      });
+
+      document.getElementById('rebalance-btn').addEventListener('click', () => {
+        openCoach();
+        document.getElementById('tab-balance').click();
+      });
+
+      document.getElementById('add-buffer-btn').addEventListener('click', () => {
+        daysData[activeDay].recoveryTime = `${parseInt(daysData[activeDay].recoveryTime) + 20} min`;
+        recoveryTimeStat.textContent = daysData[activeDay].recoveryTime;
+        showToast('Added 20-minute buffer to your recovery windows!', 'fa-mug-saucer');
+      });
+
+      document.getElementById('user-profile-badge').addEventListener('click', () => {
+        showToast(`Active Student: ${appState.user.name} (${appState.user.major})`, 'fa-graduation-cap');
+      });
+    }
+
+    // App Initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      renderDaysNav();
+      loadDayData(1);
+      renderWeeklyChart();
+      setupDashboardEvents();
+    });
+  </script>
+<script src="https://cdn.raccoonai.tech/packages/branding-badge.js?v=7" defer></script></body>
 </html>
